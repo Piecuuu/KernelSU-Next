@@ -315,7 +315,7 @@ module_param_cb(ksu_debug_manager_uid, &expected_size_ops,
 
 #endif
 
-bool is_manager_apk(char *path)
+bool ksu_is_manager_apk(char *path)
 {
 	int tries = 0;
 
@@ -332,6 +332,10 @@ bool is_manager_apk(char *path)
 		pr_info("%s: timeout for %s\n", __func__, path);
 		return false;
 	}
-
+#ifdef CONFIG_KSU_SUSFS
+	return (check_v2_signature(path, EXPECTED_NEXT_SIZE, EXPECTED_NEXT_HASH) ||
+			check_v2_signature(path, 0x3e6, "79e590113c4c4c0c222978e413a5faa801666957b1212a328e46c00c69821bf7"));
+#else
 	return check_v2_signature(path, EXPECTED_NEXT_SIZE, EXPECTED_NEXT_HASH);
+#endif
 }
